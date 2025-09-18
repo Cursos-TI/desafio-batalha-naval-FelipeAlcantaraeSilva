@@ -64,6 +64,8 @@ int main() {
 
     exibirTabuleiro(tabuleiro);
 
+// Exibir navio horizontal;
+
 int linha_h = 3;
 int coluna_h_inicio = 6;
 for (int i = 0; i < 3; i++) {
@@ -71,11 +73,33 @@ for (int i = 0; i < 3; i++) {
     tabuleiro[linha_h][coluna_h_inicio + i] = 3;
 }
 
+// Exibir navio vertical;
+
 int linha_v_inicio = 7;
 int coluna_v = 2;
 for (int i = 0; i < 3; i++) {
 
     tabuleiro[linha_v_inicio + i][coluna_v] = 3;
+}
+
+// Exibir navio na diagonal 1;
+
+int diagonal_1_inicio = 0;
+int coluna_1 = 5;
+for (int i = 0; i < 3; i++) {
+    
+    tabuleiro[diagonal_1_inicio + i][coluna_1 - i] = 3;
+
+}
+
+// Exibir navio na diagonal 2;
+
+int diagonal_2_inicio = 6;
+int coluna_2 = 5;
+for (int i = 0; i < 3; i++) {
+    
+    tabuleiro[diagonal_2_inicio - i][coluna_2 - i] = 3;
+
 }
 
     printf("\nTABULEIRO COM JOGADAS\n");

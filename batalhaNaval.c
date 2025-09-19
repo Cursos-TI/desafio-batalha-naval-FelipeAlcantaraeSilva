@@ -1,16 +1,21 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-// Iniciar o tabuleiro;
+#define TAMANHO_TABULEIRO 10
+#define TAMANHO_HABILIDADE 5
+#define AGUA 0
+#define NAVIO 3
+#define EFEITO 5
 
-void inicializarTabuleiro(int tabuleiro[10][10]) {
+// Inicia tabuleiro com AGUA
 
-    int i, j;
+void inicializarTabuleiro(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]) {
 
-    for (i = 0; i < 10; i++) {
+    for (int i = 0; i < TAMANHO_TABULEIRO; i++) {
 
-        for (j = 0; j < 10; j++) {
+        for (int j = 0; j < TAMANHO_TABULEIRO; j++) {
 
-            tabuleiro[i][j] = 0;
+            tabuleiro[i][j] = AGUA;
 
         }
 
@@ -18,17 +23,15 @@ void inicializarTabuleiro(int tabuleiro[10][10]) {
 
 }
 
-// Exibir o tabuleiro;
+// Exibe o tabuleiro
 
-void exibirTabuleiro(int tabuleiro[10][10]) {
+void exibirTabuleiro(int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO]) {
 
-    int i, j;
-
-    // Espaço na primeira linha para alinhar o cabeçalho;
+    // Exibe o cabeçalho
 
     printf("\n   ");
 
-    for (j = 0; j < 10; j++) {
+    for (int j = 0; j < TAMANHO_TABULEIRO; j++) {
 
         printf("%3c", 'A' + j);
 
@@ -36,15 +39,34 @@ void exibirTabuleiro(int tabuleiro[10][10]) {
 
     printf("\n");
 
-    // Exibe as linhas;
+    // Exibe as linhas
 
-    for (i = 0; i < 10; i++) {
+    for (int i = 0; i < TAMANHO_TABULEIRO; i++) {
 
         printf("%2d ", i);
 
-        for (j = 0; j < 10; j++) {
+        for (int j = 0; j < TAMANHO_TABULEIRO; j++) {
 
-            printf("%3d", tabuleiro[i][j]);
+            // Representação da água
+            if (tabuleiro[i][j] == AGUA) {
+                
+                printf("  0");
+
+            // Representação do navio
+            } else if (tabuleiro[i][j] == NAVIO) {
+
+                printf("  3");
+
+            // Representação do efeito/habilidade
+            } else if (tabuleiro[i][j] == EFEITO) {
+
+                printf("  5");
+
+            } else {
+
+                printf("%3d", tabuleiro[i][j]);
+
+            }
 
         }
 
@@ -54,55 +76,188 @@ void exibirTabuleiro(int tabuleiro[10][10]) {
 
 }
 
+// Cria o CONE
+
+void criarHabilidadeCone(int habilidade[TAMANHO_HABILIDADE][TAMANHO_HABILIDADE]) {
+
+    int centro = TAMANHO_HABILIDADE / 2;
+
+    for (int i = 0; i < TAMANHO_HABILIDADE; i++) {
+
+        for (int j = 0; j < TAMANHO_HABILIDADE; j++) {
+
+            habilidade[i][j] = 0;
+
+        }
+
+    }
+
+    for (int i = 0; i < TAMANHO_HABILIDADE; i++) {
+
+        for (int j = centro - i; j <= centro + i; j++) {
+
+            if (j >= 0 && j < TAMANHO_HABILIDADE) {
+
+                habilidade[i][j] = 1;
+
+            }
+
+        }
+
+    }
+
+}
+
+// Cria a CRUZ
+
+void criarHabilidadeCruz(int habilidade[TAMANHO_HABILIDADE][TAMANHO_HABILIDADE]) {
+
+    int centro = TAMANHO_HABILIDADE / 2;
+
+    for (int i = 0; i < TAMANHO_HABILIDADE; i++) {
+
+        for (int j = 0; j < TAMANHO_HABILIDADE; j++) {
+
+            habilidade[i][j] = 0;
+
+        }
+
+    }
+
+    for (int i = 0; i < TAMANHO_HABILIDADE; i++) {
+
+        habilidade[centro][i] = 1;
+
+        habilidade[i][centro] = 1;
+
+    }
+
+}
+
+// Cria o OCTAEDRO
+
+void criarHabilidadeOctaedro(int habilidade[TAMANHO_HABILIDADE][TAMANHO_HABILIDADE]) {
+    
+    int centro = TAMANHO_HABILIDADE / 2;
+    
+    for (int i = 0; i < TAMANHO_HABILIDADE; i++) {
+    
+        for (int j = 0; j < TAMANHO_HABILIDADE; j++) {
+            
+            if (abs(i - centro) + abs(j - centro) <= centro) {
+            
+                habilidade[i][j] = 1;
+            
+            } else {
+            
+                habilidade[i][j] = 0;
+            }
+        }
+    }
+}
+
+// Sobreposição
+
+void sobreporHabilidade(
+
+    int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO], int matriz_habilidade[TAMANHO_HABILIDADE][TAMANHO_HABILIDADE],
+
+    int linha_central,
+
+    int coluna_central) {
+
+    int tamanho_metade = TAMANHO_HABILIDADE / 2;
+
+    int linha_inicio = linha_central - tamanho_metade;
+
+    int coluna_inicio = coluna_central - tamanho_metade;
+
+        for (int linha_habilidade = 0; linha_habilidade < TAMANHO_HABILIDADE; linha_habilidade++) {
+
+            for (int coluna_habilidade = 0; coluna_habilidade < TAMANHO_HABILIDADE; coluna_habilidade++) {
+
+                int linha_tabuleiro = linha_inicio + linha_habilidade;
+
+                int coluna_tabuleiro = coluna_inicio + coluna_habilidade;
+
+                if (linha_tabuleiro >= 0 && linha_tabuleiro < TAMANHO_TABULEIRO &&
+
+                coluna_tabuleiro >= 0 && coluna_tabuleiro < TAMANHO_TABULEIRO) {
+
+                if (matriz_habilidade[linha_habilidade][coluna_habilidade] == 1) {
+
+                tabuleiro[linha_tabuleiro][coluna_tabuleiro] = EFEITO;
+
+                }
+
+                if (matriz_habilidade[linha_habilidade][coluna_habilidade] == 1) {
+
+                if (tabuleiro[linha_tabuleiro][coluna_tabuleiro] == AGUA) {
+
+                    tabuleiro[linha_tabuleiro][coluna_tabuleiro] = EFEITO;
+                }
+                
+                }
+
+            }
+
+        }
+
+    }
+
+}
+
 int main() {
 
-    int tabuleiro[10][10];
+    int tabuleiro[TAMANHO_TABULEIRO][TAMANHO_TABULEIRO];
+
+    int habilidade_cone[TAMANHO_HABILIDADE][TAMANHO_HABILIDADE];
+
+    int habilidade_cruz[TAMANHO_HABILIDADE][TAMANHO_HABILIDADE];
+
+    int habilidade_octaedro[TAMANHO_HABILIDADE][TAMANHO_HABILIDADE];
+
+    criarHabilidadeCone(habilidade_cone);
+
+    criarHabilidadeCruz(habilidade_cruz);
+
+    criarHabilidadeOctaedro(habilidade_octaedro);
+
+    // Navios e CONE
 
     inicializarTabuleiro(tabuleiro);
 
-    printf("TABULEIRO EM BRANCO \n");
+    for (int i = 0; i < 3; i++) { tabuleiro[2][7 + i] = NAVIO; }
+
+    for (int i = 0; i < 3; i++) { tabuleiro[6 + i][1] = NAVIO; }
+
+    printf("\nNavios e habilidade de CONE\n");
+
+    sobreporHabilidade(tabuleiro, habilidade_cone, 3, 4);
 
     exibirTabuleiro(tabuleiro);
 
-// Exibir navio horizontal;
+    // Navios e CRUZ
 
-int linha_h = 3;
-int coluna_h_inicio = 6;
-for (int i = 0; i < 3; i++) {
-    
-    tabuleiro[linha_h][coluna_h_inicio + i] = 3;
-}
+    inicializarTabuleiro(tabuleiro);
 
-// Exibir navio vertical;
+    for (int i = 0; i < 3; i++) { tabuleiro[4 - i][5 - i] = NAVIO; }
 
-int linha_v_inicio = 7;
-int coluna_v = 2;
-for (int i = 0; i < 3; i++) {
+    printf("\nNavios e habilidade de CRUZ\n");
 
-    tabuleiro[linha_v_inicio + i][coluna_v] = 3;
-}
+    sobreporHabilidade(tabuleiro, habilidade_cruz, 7, 7);
 
-// Exibir navio na diagonal 1;
+    exibirTabuleiro(tabuleiro);
 
-int diagonal_1_inicio = 0;
-int coluna_1 = 5;
-for (int i = 0; i < 3; i++) {
-    
-    tabuleiro[diagonal_1_inicio + i][coluna_1 - i] = 3;
+    // Navios e OCTAEDRO
 
-}
+    inicializarTabuleiro(tabuleiro);
 
-// Exibir navio na diagonal 2;
+    for (int i = 0; i < 3; i++) { tabuleiro[7 + i][9 - i] = NAVIO; }
 
-int diagonal_2_inicio = 6;
-int coluna_2 = 5;
-for (int i = 0; i < 3; i++) {
-    
-    tabuleiro[diagonal_2_inicio - i][coluna_2 - i] = 3;
+    printf("\nNavios e habilidade de OCTAEDRO\n");
 
-}
-
-    printf("\nTABULEIRO COM JOGADAS\n");
+    sobreporHabilidade(tabuleiro, habilidade_octaedro, 5, 5);
 
     exibirTabuleiro(tabuleiro);
 
